@@ -10,33 +10,13 @@ import { Input } from '@/components/ui/input'
 import { Progress } from '@/components/ui/progress'
 import { Separator } from '@/components/ui/separator'
 
-// Классы статусов — в модуле 1 переедут в lib/status.ts
-const statuses = [
-  {
-    code: 'yes',
-    label: 'Делаем',
-    on: 'bg-emerald-100 text-emerald-800 border-emerald-300 dark:bg-emerald-950 dark:text-emerald-300 dark:border-emerald-800',
-  },
-  {
-    code: 'no',
-    label: 'Не делаем',
-    on: 'bg-red-100 text-red-800 border-red-300 dark:bg-red-950 dark:text-red-300 dark:border-red-800',
-  },
-  {
-    code: 'planned',
-    label: 'Планируем',
-    on: 'bg-blue-100 text-blue-800 border-blue-300 dark:bg-blue-950 dark:text-blue-300 dark:border-blue-800',
-  },
-  {
-    code: 'ask',
-    label: 'Уточнить',
-    on: 'bg-amber-100 text-amber-800 border-amber-300 dark:bg-amber-950 dark:text-amber-300 dark:border-amber-800',
-  },
-] as const
+import type { ServiceStatus } from '@/api'
+import { STATUS, STATUS_CHOICES, nextStatus } from '@/lib/status'
 
-const status = ref<string>('yes')
+const statuses = STATUS_CHOICES.map((c) => STATUS[c])
+const status = ref<ServiceStatus>('yes')
 const filter = ref<'all' | 'unknown'>('all')
-const toggle = (code: string) => (status.value = status.value === code ? 'unknown' : code)
+const toggle = (code: ServiceStatus) => (status.value = nextStatus(status.value, code))
 </script>
 
 <template>
@@ -89,7 +69,7 @@ const toggle = (code: string) => (status.value = status.value === code ? 'unknow
             :aria-pressed="status === s.code"
             :class="[
               'h-10 rounded-full border px-4 text-sm font-medium transition-colors active:scale-95',
-              status === s.code ? s.on : 'bg-background text-muted-foreground hover:bg-muted',
+              status === s.code ? s.chip : 'bg-background text-muted-foreground hover:bg-muted',
             ]"
             @click="toggle(s.code)"
           >
