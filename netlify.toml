@@ -1,0 +1,9 @@
+# Прокси /api и SPA-фолбэк — в dist/_redirects, генерируется при сборке из API_URL (vite.config.ts).
+[build]
+  command = "npm run build"
+  publish = "dist"
+
+[[headers]]
+  for = "/*"
+  [headers.values]
+    X-Robots-Tag = "noindex, nofollow"
