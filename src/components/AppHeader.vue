@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { ref } from 'vue'
 import { RouterLink, useRouter } from 'vue-router'
-import { LogOut, ScrollText } from '@lucide/vue'
+import { LogOut, ScrollText, Trash2 } from '@lucide/vue'
 import { toast } from 'vue-sonner'
 import { useAuthStore } from '@/stores/auth'
 import { Button } from '@/components/ui/button'
@@ -9,6 +9,11 @@ import { Button } from '@/components/ui/button'
 const auth = useAuthStore()
 const router = useRouter()
 const leaving = ref(false)
+
+const links = [
+  { to: '/journal', label: 'Журнал', icon: ScrollText },
+  { to: '/trash', label: 'Корзина', icon: Trash2 },
+]
 
 async function logout() {
   leaving.value = true
@@ -32,13 +37,17 @@ async function logout() {
         <img src="/favicon.svg" alt="" class="size-7 rounded-lg" />
         Цены
       </RouterLink>
-      <nav class="ml-2 flex items-center gap-1">
+      <nav class="ml-1 flex items-center gap-1 sm:ml-2">
         <RouterLink
-          to="/journal"
-          class="text-muted-foreground hover:text-foreground hover:bg-muted flex h-9 items-center gap-1.5 rounded-md px-2.5 text-sm font-medium transition-colors"
+          v-for="l in links"
+          :key="l.to"
+          :to="l.to"
+          :aria-label="l.label"
+          class="text-muted-foreground hover:text-foreground hover:bg-muted flex h-10 min-w-10 items-center justify-center gap-1.5 rounded-md px-2.5 text-sm font-medium transition-colors"
           active-class="text-foreground bg-muted"
         >
-          <ScrollText class="size-4" />Журнал
+          <component :is="l.icon" class="size-4" />
+          <span class="hidden sm:inline">{{ l.label }}</span>
         </RouterLink>
       </nav>
       <span class="text-muted-foreground ml-auto truncate text-sm">{{ auth.user?.name }}</span>
