@@ -1,6 +1,14 @@
 <script setup lang="ts">
 import { computed, nextTick, ref } from 'vue'
-import { ArrowRightLeft, Ellipsis, Plus, StickyNote, Trash2 } from '@lucide/vue'
+import {
+  ArrowRightLeft,
+  ChevronRight,
+  Ellipsis,
+  History,
+  Plus,
+  StickyNote,
+  Trash2,
+} from '@lucide/vue'
 import { toast } from 'vue-sonner'
 import type { ServiceCard, ServiceStatus } from '@/api'
 import { formatDateTime, userName } from '@/lib/format'
@@ -19,6 +27,7 @@ import StatusChips from './StatusChips.vue'
 import PriceRow from './PriceRow.vue'
 import PriceForm, { type PriceValues } from './PriceForm.vue'
 import MoveDialog from './MoveDialog.vue'
+import HistorySheet from './HistorySheet.vue'
 
 const props = defineProps<{ service: ServiceCard }>()
 const emit = defineEmits<{ interact: [] }>()
@@ -28,6 +37,7 @@ const s = computed(() => props.service)
 const showComment = ref(false)
 const addingPrice = ref(false)
 const moveOpen = ref(false)
+const historyOpen = ref(false)
 const commentEditor = ref<InstanceType<typeof EditableText> | null>(null)
 
 const confirmedCount = computed(() => s.value.prices.filter((p) => p.confirmed).length)
@@ -170,11 +180,21 @@ async function move(categoryId: number, title: string) {
       </Button>
     </section>
 
-    <footer class="text-muted-foreground border-t pt-3 text-xs">
-      <template v-if="s.lastChange">
-        Изменено: {{ userName(s.lastChange.user) }} · {{ formatDateTime(s.lastChange.at) }}
-      </template>
-      <template v-else>Без изменений с импорта</template>
+    <footer class="text-muted-foreground -mx-2 -mb-2 border-t pt-1 text-xs">
+      <button
+        v-if="s.lastChange"
+        type="button"
+        class="hover:bg-muted/60 hover:text-foreground flex min-h-10 w-full items-center gap-2 rounded-md px-2 text-left transition-colors"
+        @click="historyOpen = true"
+      >
+        <span class="min-w-0 flex-1 truncate">
+          Изменено: {{ userName(s.lastChange.user) }} · {{ formatDateTime(s.lastChange.at) }}
+        </span>
+        <span class="text-foreground flex shrink-0 items-center gap-1 font-medium">
+          <History class="size-3.5" />История<ChevronRight class="size-3.5" />
+        </span>
+      </button>
+      <p v-else class="flex min-h-10 items-center px-2">Без изменений с импорта</p>
     </footer>
 
     <MoveDialog
@@ -183,5 +203,6 @@ async function move(categoryId: number, title: string) {
       :current-category-id="s.categoryId"
       @select="move"
     />
+    <HistorySheet v-model:open="historyOpen" :service-id="s.id" :service-title="s.title" />
   </article>
 </template>

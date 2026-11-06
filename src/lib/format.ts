@@ -24,6 +24,33 @@ export function formatDateTime(iso: string): string {
   return (sameYear ? dtFmt : dtYearFmt).format(d)
 }
 
+const timeFmt = new Intl.DateTimeFormat('ru-RU', {
+  timeZone: TZ,
+  hour: '2-digit',
+  minute: '2-digit',
+})
+const dayKeyFmt = new Intl.DateTimeFormat('en-CA', { timeZone: TZ })
+const dayFmt = new Intl.DateTimeFormat('ru-RU', { timeZone: TZ, day: 'numeric', month: 'long' })
+const dayYearFmt = new Intl.DateTimeFormat('ru-RU', {
+  timeZone: TZ,
+  day: 'numeric',
+  month: 'long',
+  year: 'numeric',
+})
+
+export const formatTime = (iso: string) => timeFmt.format(new Date(iso))
+
+export const dayKey = (iso: string) => dayKeyFmt.format(new Date(iso))
+
+export function formatDay(iso: string): string {
+  const d = new Date(iso)
+  const key = dayKeyFmt.format(d)
+  const now = Date.now()
+  if (key === dayKeyFmt.format(now)) return 'Сегодня'
+  if (key === dayKeyFmt.format(now - 86_400_000)) return 'Вчера'
+  return (yearFmt.format(d) === yearFmt.format(now) ? dayFmt : dayYearFmt).format(d)
+}
+
 // ---------- Цены ----------
 
 export const PRICE_MAX = 100_000
