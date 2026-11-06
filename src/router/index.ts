@@ -16,7 +16,13 @@ const router = createRouter({
       component: () => import('@/views/LoginView.vue'),
       meta: { public: true },
     },
-    { path: '/', name: 'home', component: () => import('@/views/HomeView.vue') },
+    { path: '/', name: 'home', component: () => import('@/views/CategoriesView.vue') },
+    {
+      path: '/categories/:id(\\d+)',
+      name: 'category',
+      component: () => import('@/views/CategoryView.vue'),
+      props: (route) => ({ id: Number(route.params.id) }),
+    },
     { path: '/:pathMatch(.*)*', redirect: '/' },
   ],
 })
