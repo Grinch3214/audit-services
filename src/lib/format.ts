@@ -90,3 +90,10 @@ export function userName(login: string | null | undefined): string {
 }
 
 export const USERS = ['max', 'dima', 'ilya'] as const
+
+const pluralRules = new Intl.PluralRules('ru-RU')
+
+export function plural(n: number, one: string, few: string, many: string): string {
+  const form = pluralRules.select(n)
+  return `${numFmt.format(n)} ${form === 'one' ? one : form === 'few' ? few : many}`
+}

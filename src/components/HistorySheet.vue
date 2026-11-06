@@ -3,11 +3,11 @@ import { computed, ref, watch } from 'vue'
 import { useMediaQuery } from '@vueuse/core'
 import { RotateCw } from '@lucide/vue'
 import { isApiError, servicesApi, type HistoryEntry } from '@/api'
-import { describeChange, type ChangeView } from '@/lib/changes'
-import { dayKey, formatDay, formatTime, userName } from '@/lib/format'
+import { describeChange } from '@/lib/changes'
 import { useCatalogStore } from '@/stores/catalog'
 import { Button } from '@/components/ui/button'
 import { Skeleton } from '@/components/ui/skeleton'
+import ChangeTimeline, { type TimelineItem } from './ChangeTimeline.vue'
 import {
   Sheet,
   SheetContent,
@@ -56,38 +56,14 @@ watch(open, (v) => {
 
 const categoryTitle = (id: number) => catalog.categories?.find((c) => c.id === id)?.title
 
-interface Item {
-  id: number
-  user: string
-  time: string
-  view: ChangeView
-}
-
-const groups = computed(() => {
-  const out: { key: string; label: string; items: Item[] }[] = []
-  for (const e of entries.value ?? []) {
-    const key = dayKey(e.at)
-    let g = out[out.length - 1]
-    if (!g || g.key !== key) out.push((g = { key, label: formatDay(e.at), items: [] }))
-    g.items.push({
-      id: e.id,
-      user: userName(e.user),
-      time: formatTime(e.at),
-      view: describeChange(e, {
-        subject: e.entity === 'price' ? e.priceTitle : null,
-        categoryTitle,
-      }),
-    })
-  }
-  return out
-})
-
-const DOT: Record<ChangeView['tone'], string> = {
-  create: 'bg-emerald-500',
-  update: 'bg-primary',
-  delete: 'bg-red-500',
-  restore: 'bg-blue-500',
-}
+const items = computed<TimelineItem[]>(() =>
+  (entries.value ?? []).map((e) => ({
+    id: e.id,
+    at: e.at,
+    user: e.user,
+    view: describeChange(e, { subject: e.entity === 'price' ? e.priceTitle : null, categoryTitle }),
+  })),
+)
 </script>
 
 <template>
@@ -127,57 +103,7 @@ const DOT: Record<ChangeView['tone'], string> = {
         </p>
 
         <template v-else>
-          <section v-for="g in groups" :key="g.key" class="mb-4 last:mb-0">
-            <h3
-              class="bg-popover text-muted-foreground sticky -top-3 z-10 py-1.5 text-xs font-medium"
-            >
-              {{ g.label }}
-            </h3>
-            <ol class="flex flex-col">
-              <li
-                v-for="it in g.items"
-                :key="it.id"
-                class="relative flex gap-3 pb-4 last:pb-1 [&:not(:last-child)]:before:absolute [&:not(:last-child)]:before:top-4 [&:not(:last-child)]:before:bottom-0 [&:not(:last-child)]:before:left-[3.5px] [&:not(:last-child)]:before:w-px [&:not(:last-child)]:before:bg-border"
-              >
-                <span :class="['mt-1.5 size-2 shrink-0 rounded-full', DOT[it.view.tone]]" />
-                <div class="flex min-w-0 flex-1 flex-col gap-1">
-                  <p class="text-muted-foreground text-xs tabular-nums">
-                    <span class="text-foreground font-medium">{{ it.user }}</span> · {{ it.time }}
-                  </p>
-                  <p class="text-sm leading-snug">
-                    {{ it.view.text
-                    }}<template v-if="it.view.subject">
-                      «<span class="font-medium">{{ it.view.subject }}</span
-                      >»</template
-                    >
-                  </p>
-                  <ul v-if="it.view.lines.length" class="flex flex-col gap-1 text-sm">
-                    <li
-                      v-for="(l, i) in it.view.lines"
-                      :key="i"
-                      :class="[
-                        'min-w-0 leading-snug break-words',
-                        l.long
-                          ? 'flex flex-col gap-0.5'
-                          : 'flex flex-wrap items-baseline gap-x-1.5',
-                      ]"
-                    >
-                      <span v-if="l.label" class="text-muted-foreground">{{ l.label }}:</span>
-                      <template v-if="l.from !== undefined">
-                        <span class="text-muted-foreground line-through decoration-1">{{
-                          l.from
-                        }}</span>
-                        <span v-if="!l.long" class="text-muted-foreground" aria-hidden="true"
-                          >→</span
-                        >
-                      </template>
-                      <span>{{ l.to }}</span>
-                    </li>
-                  </ul>
-                </div>
-              </li>
-            </ol>
-          </section>
+          <ChangeTimeline :items="items" header-class="bg-popover -top-3" />
           <p
             v-if="entries.length >= HISTORY_LIMIT"
             class="text-muted-foreground pt-2 text-center text-xs"

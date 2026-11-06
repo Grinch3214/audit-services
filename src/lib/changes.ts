@@ -1,5 +1,5 @@
-import type { AuditAction, AuditEntity, Changes, ServiceStatus } from '@/api/types'
-import { formatPrice } from './format'
+import type { AuditAction, AuditEntity, Changes, ImportSummary, ServiceStatus } from '@/api/types'
+import { formatPrice, plural } from './format'
 import { STATUS } from './status'
 
 export interface ChangeLine {
@@ -13,7 +13,7 @@ export interface ChangeView {
   text: string
   subject?: string
   lines: ChangeLine[]
-  tone: AuditAction
+  tone: AuditAction | 'import'
 }
 
 interface Entry {
@@ -118,3 +118,16 @@ export function describeChange(e: Entry, ctx: ChangeContext = {}): ChangeView {
 }
 
 const str = (v: unknown) => (typeof v === 'string' ? v : '')
+
+export function describeImport(sum: ImportSummary): ChangeView {
+  const parts = [
+    plural(sum.categories, 'категория', 'категории', 'категорий'),
+    plural(sum.services, 'услуга', 'услуги', 'услуг'),
+    plural(sum.prices, 'цена', 'цены', 'цен'),
+  ]
+  return {
+    text: `Импорт: ${parts.join(', ')}`,
+    lines: sum.source ? [{ label: 'Источник', to: sum.source }] : [],
+    tone: 'import',
+  }
+}

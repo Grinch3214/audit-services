@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { ref } from 'vue'
 import { RouterLink, useRouter } from 'vue-router'
-import { LogOut } from '@lucide/vue'
+import { LogOut, ScrollText } from '@lucide/vue'
 import { toast } from 'vue-sonner'
 import { useAuthStore } from '@/stores/auth'
 import { Button } from '@/components/ui/button'
@@ -32,6 +32,15 @@ async function logout() {
         <img src="/favicon.svg" alt="" class="size-7 rounded-lg" />
         Цены
       </RouterLink>
+      <nav class="ml-2 flex items-center gap-1">
+        <RouterLink
+          to="/journal"
+          class="text-muted-foreground hover:text-foreground hover:bg-muted flex h-9 items-center gap-1.5 rounded-md px-2.5 text-sm font-medium transition-colors"
+          active-class="text-foreground bg-muted"
+        >
+          <ScrollText class="size-4" />Журнал
+        </RouterLink>
+      </nav>
       <span class="text-muted-foreground ml-auto truncate text-sm">{{ auth.user?.name }}</span>
       <Button variant="ghost" size="icon" aria-label="Выйти" :disabled="leaving" @click="logout">
         <LogOut />

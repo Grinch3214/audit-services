@@ -23,6 +23,7 @@ const router = createRouter({
       component: () => import('@/views/CategoryView.vue'),
       props: (route) => ({ id: Number(route.params.id) }),
     },
+    { path: '/journal', name: 'journal', component: () => import('@/views/JournalView.vue') },
     { path: '/:pathMatch(.*)*', redirect: '/' },
   ],
 })
