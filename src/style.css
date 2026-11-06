@@ -135,3 +135,9 @@
     font-feature-settings: 'cv11';
   }
 }
+
+/* вне @layer — перебивает cursor-default в пунктах меню shadcn */
+[role='menuitem']:not([data-disabled]),
+[role='option']:not([data-disabled]) {
+  cursor: pointer;
+}
