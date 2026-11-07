@@ -1,7 +1,7 @@
 <script setup lang="ts">
-import { computed, reactive, ref, watch } from 'vue'
+import { computed, nextTick, reactive, ref, watch } from 'vue'
 import { storeToRefs } from 'pinia'
-import { RouterLink } from 'vue-router'
+import { RouterLink, useRoute, useRouter } from 'vue-router'
 import { ArrowLeft, RotateCw, Search, X } from '@lucide/vue'
 import { isApiError, type ServiceCard as Card, type ServiceStatus } from '@/api'
 import { STATUS, STATUS_FILTERS } from '@/lib/status'
@@ -24,11 +24,28 @@ async function load() {
   error.value = ''
   try {
     await store.load(props.id)
+    void focusService()
   } catch (e) {
     error.value = isApiError(e) ? e.message : 'Не удалось загрузить категорию'
   } finally {
     loading.value = false
   }
+}
+
+const route = useRoute()
+const router = useRouter()
+const FOCUS_RING = ['ring-2', 'ring-primary']
+
+async function focusService() {
+  const id = Number(route.query.service)
+  if (!id) return
+  void router.replace({ query: {} })
+  await nextTick()
+  const el = document.getElementById(`service-${id}`)
+  if (!el) return
+  el.scrollIntoView({ block: 'start', behavior: 'smooth' })
+  el.classList.add(...FOCUS_RING)
+  setTimeout(() => el.classList.remove(...FOCUS_RING), 2000)
 }
 
 watch(() => props.id, load, { immediate: true })

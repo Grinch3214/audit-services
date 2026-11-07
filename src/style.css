@@ -141,3 +141,7 @@
 [role='option']:not([data-disabled]) {
   cursor: pointer;
 }
+
+input[type='search']::-webkit-search-cancel-button {
+  appearance: none;
+}

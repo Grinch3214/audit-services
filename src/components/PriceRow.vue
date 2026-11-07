@@ -4,6 +4,7 @@ import { Check } from '@lucide/vue'
 import type { Price } from '@/api'
 import { formatPrice } from '@/lib/format'
 import { useCategoryStore } from '@/stores/category'
+import { confirm } from '@/composables/useConfirm'
 import PriceForm, { type PriceValues } from './PriceForm.vue'
 
 const props = defineProps<{ price: Price }>()
@@ -28,6 +29,12 @@ async function save(v: PriceValues) {
 }
 
 async function remove() {
+  const ok = await confirm({
+    title: 'Удалить позицию?',
+    description: `«${props.price.title}» — ${formatPrice(props.price.priceFrom)}. Вернуть можно из корзины.`,
+    confirmLabel: 'Удалить позицию',
+  })
+  if (!ok) return
   if ((await store.deletePrice(props.price.serviceId, props.price.id)) === 'ok') {
     editing.value = false
   }

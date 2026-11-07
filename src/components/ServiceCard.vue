@@ -14,6 +14,7 @@ import type { ServiceCard, ServiceStatus } from '@/api'
 import { formatDateTime, userName } from '@/lib/format'
 import { nextStatus } from '@/lib/status'
 import { useCategoryStore } from '@/stores/category'
+import { confirm } from '@/composables/useConfirm'
 import { Button } from '@/components/ui/button'
 import {
   DropdownMenu,
@@ -82,6 +83,16 @@ async function addPrice(v: PriceValues) {
   return (await store.createPrice({ serviceId: s.value.id, ...v })) === 'ok'
 }
 
+async function removeService() {
+  const n = s.value.prices.length
+  const ok = await confirm({
+    title: 'Удалить услугу?',
+    description: `«${s.value.title}»${n ? ` вместе с позициями (${n})` : ''}. Вернуть можно из корзины.`,
+    confirmLabel: 'Удалить услугу',
+  })
+  if (ok) void store.deleteService(s.value.id)
+}
+
 async function move(categoryId: number, title: string) {
   if ((await store.updateService(s.value.id, { categoryId })) === 'ok') {
     toast.success(`Перенесено в «${title}»`)
@@ -90,7 +101,10 @@ async function move(categoryId: number, title: string) {
 </script>
 
 <template>
-  <article class="bg-card ring-foreground/10 flex flex-col gap-4 rounded-xl p-4 shadow-xs ring-1">
+  <article
+    :id="`service-${s.id}`"
+    class="bg-card ring-foreground/10 flex scroll-mt-48 flex-col gap-4 rounded-xl p-4 shadow-xs ring-1 transition-shadow duration-700 lg:scroll-mt-24"
+  >
     <header class="flex items-start gap-2">
       <EditableText
         class="flex-1 pt-1"
@@ -121,11 +135,7 @@ async function move(categoryId: number, title: string) {
             <StickyNote />Заметка для сайта
           </DropdownMenuItem>
           <DropdownMenuSeparator />
-          <DropdownMenuItem
-            variant="destructive"
-            class="py-2.5"
-            @select="store.deleteService(s.id)"
-          >
+          <DropdownMenuItem variant="destructive" class="py-2.5" @select="removeService">
             <Trash2 />Удалить услугу
           </DropdownMenuItem>
         </DropdownMenuContent>

@@ -3,6 +3,7 @@ import { computed } from 'vue'
 import { RouterView, useRoute } from 'vue-router'
 import { Toaster } from '@/components/ui/sonner'
 import AppHeader from '@/components/AppHeader.vue'
+import ConfirmDialog from '@/components/ConfirmDialog.vue'
 import { useAuthStore } from '@/stores/auth'
 
 const auth = useAuthStore()
@@ -18,4 +19,5 @@ const showHeader = computed(() => auth.isAuthed && !route.meta.public)
     <RouterView />
   </main>
   <Toaster position="top-center" rich-colors />
+  <ConfirmDialog />
 </template>
