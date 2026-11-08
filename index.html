@@ -1,29 +1,31 @@
 <!DOCTYPE html>
 <html lang="ru">
-  <head>
-    <meta charset="UTF-8">
-    <link rel="icon" href="/favicon.ico" sizes="48x48">
-    <link rel="icon" href="/favicon.svg" type="image/svg+xml">
-    <link rel="apple-touch-icon" href="/apple-touch-icon.png">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
-    <meta name="robots" content="noindex, nofollow">
-    <meta name="theme-color" content="#ffffff" media="(prefers-color-scheme: light)">
-    <meta name="theme-color" content="#0a0a0a" media="(prefers-color-scheme: dark)">
-    <title>Цены — Автосиндикат</title>
-    <script>
-      // Тёмная тема по настройке системы (shadcn ждёт класс .dark). До рендера — без мигания.
-      ;(function () {
-        var mq = window.matchMedia('(prefers-color-scheme: dark)')
-        var apply = function () {
-          document.documentElement.classList.toggle('dark', mq.matches)
-        }
-        apply()
-        mq.addEventListener('change', apply)
-      })()
-    </script>
-  </head>
-  <body>
-    <div id="app"></div>
-    <script type="module" src="/src/main.ts"></script>
-  </body>
+
+<head>
+	<meta charset="UTF-8">
+	<link rel="icon" href="/favicon.ico" sizes="48x48">
+	<link rel="icon" href="/favicon.svg" type="image/svg+xml">
+	<link rel="apple-touch-icon" href="/apple-touch-icon.png">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+	<meta name="robots" content="noindex, nofollow">
+	<meta name="theme-color" content="#ffffff" media="(prefers-color-scheme: light)">
+	<meta name="theme-color" content="#0a0a0a" media="(prefers-color-scheme: dark)">
+	<title>Цены — Автосервис</title>
+	<script>
+		; (function () {
+			var mq = window.matchMedia('(prefers-color-scheme: dark)')
+			var apply = function () {
+				document.documentElement.classList.toggle('dark', mq.matches)
+			}
+			apply()
+			mq.addEventListener('change', apply)
+		})()
+	</script>
+</head>
+
+<body>
+	<div id="app"></div>
+	<script type="module" src="/src/main.ts"></script>
+</body>
+
 </html>

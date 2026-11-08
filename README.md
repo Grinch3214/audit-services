@@ -1,48 +1,71 @@
-# .
+# Auto Service Pricing — Frontend
 
-This template should help get you started developing with Vue 3 in Vite.
+Private, mobile-first web app for auditing an auto service's catalog: which services are actually offered, which prices are correct, and what is missing. The output is a verified price list used for the new website, Google Business profile and ads.
 
-## Recommended IDE Setup
+## Features
 
-[VS Code](https://code.visualstudio.com/) + [Vue (Official)](https://marketplace.visualstudio.com/items?itemName=Vue.volar) (and disable Vetur).
+- **Catalog** — categories → services → price items, with inline editing, reordering and moving between categories
+- **Service status** — not checked / offered / not offered, plus confirmed flags on prices
+- **Progress** — overall audit completion summary
+- **Search** — across categories, services and prices
+- **History & journal** — per-record change timeline and a global audit log
+- **Trash** — soft-deleted records with restore
+- **Export** — download the full catalog as JSON
+- **Conflict handling** — optimistic locking; `409` responses surface the current server version
 
-## Recommended Browser Setup
+## Stack
 
-- Chromium-based browsers (Chrome, Edge, Brave, etc.):
-  - [Vue.js devtools](https://chromewebstore.google.com/detail/vuejs-devtools/nhdogjmejiglipccpnnnanhbledajbpd)
-  - [Turn on Custom Object Formatter in Chrome DevTools](http://bit.ly/object-formatters)
-- Firefox:
-  - [Vue.js devtools](https://addons.mozilla.org/en-US/firefox/addon/vue-js-devtools/)
-  - [Turn on Custom Object Formatter in Firefox DevTools](https://fxdx.dev/firefox-devtools-custom-object-formatters/)
+Vue 3 (`<script setup>`, TypeScript) · Vite · Vue Router · Pinia · Tailwind CSS 4 · shadcn-vue (Reka UI) · VueUse · vue-sonner
 
-## Type Support for `.vue` Imports in TS
+## Getting started
 
-TypeScript cannot handle type information for `.vue` imports by default, so we replace the `tsc` CLI with `vue-tsc` for type checking. In editors, we need [Volar](https://marketplace.visualstudio.com/items?itemName=Vue.volar) to make the TypeScript language service aware of `.vue` types.
-
-## Customize configuration
-
-See [Vite Configuration Reference](https://vite.dev/config/).
-
-## Project Setup
+Requires Node `^22.18` or `>=24.12`.
 
 ```sh
+cp .env.example .env   # set API_URL
 npm install
-```
-
-### Compile and Hot-Reload for Development
-
-```sh
 npm run dev
 ```
 
-### Type-Check, Compile and Minify for Production
+| Variable  | Description                                                    |
+| --------- | -------------------------------------------------------------- |
+| `API_URL` | Backend origin, without `/api` and without a trailing slash. Required. |
 
-```sh
-npm run build
+Local overrides go in `.env.local` (git-ignored).
+
+## Scripts
+
+| Command              | Description                          |
+| -------------------- | ------------------------------------ |
+| `npm run dev`        | Dev server with `/api` proxy         |
+| `npm run build`      | Type-check and production build      |
+| `npm run preview`    | Serve the production build locally   |
+| `npm run lint`       | oxlint + ESLint (with `--fix`)       |
+| `npm run format`     | Prettier on `src/`                   |
+
+## How the API is wired
+
+The app always calls relative `/api/*` with cookie-based session auth (same origin).
+
+- **Dev** — Vite proxies `/api` to `API_URL` (`vite.config.ts → server.proxy`).
+- **Build** — a Vite plugin emits `dist/_redirects` with the `/api` proxy rule and the SPA fallback.
+
+## Deployment (Netlify)
+
+1. Build command `npm run build`, publish directory `dist` (already in `netlify.toml`).
+2. Set `API_URL` under **Site settings → Environment variables**.
+
+All responses are sent with `X-Robots-Tag: noindex, nofollow` — the site must not be indexed.
+
+## Project structure
+
 ```
-
-### Lint with [ESLint](https://eslint.org/)
-
-```sh
-npm run lint
+src/
+├── api/          HTTP client, typed endpoints, error types
+├── components/   Feature components; ui/ holds shadcn-vue primitives
+├── composables/  Shared composition functions
+├── lib/          Formatting, status metadata, change helpers
+├── router/       Routes and auth guard
+├── stores/       Pinia stores (auth, catalog, category)
+└── views/        Pages: Login, Categories, Category, Journal, Trash
 ```
